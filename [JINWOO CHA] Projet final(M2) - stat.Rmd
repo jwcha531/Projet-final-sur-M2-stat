@@ -317,7 +317,7 @@ Quand nous comparons deux données originales et facultatives, nous pouvons savo
 ```{r,include=FALSE}
 resultat <- as.table(matrix(c(as.character(2.2e-16), as.character(2.2e-16), 9.0611, 24.25), nrow=2, byrow=TRUE,
                 dimnames=list (c("p-valeur", "t-valeur"),
-                               c("orignal", "1000sampling")))) 
+                               c("original", "1000sampling")))) 
 ```
 ```{r}
 knitr::kable(resultat)
@@ -573,7 +573,7 @@ Quand nous comparons deux données originales et facultatives, nous pouvons savo
 ```{r, include=FALSE}
 resultat <- as.table(matrix(c(as.character(2.2e-16), as.character(2.2e-16), -20.815, -48.613), nrow=2, byrow=TRUE,
                 dimnames=list (c("p-valeur", "t-valeur"),
-                               c("orignal", "1000sampling")))) 
+                               c("original", "1000sampling")))) 
 ```
 ```{r}
 knitr::kable(resultat)
