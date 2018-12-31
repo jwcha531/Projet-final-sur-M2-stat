@@ -1,0 +1,623 @@
+---
+title: "Projet final - M2 statistiques"
+author: "JINWOO CHA"
+date: "12/Dec/2018"
+output: html_document
+---
+
+##Introduction
+De nos jours, la voiture est indispensable dans notre vie. En ce moment, nous fabriquons des nouvelles voitures, nous échangeons des voitures d’occasion grâce au marché de la voiture d’occasion, et nous envoyons des voitures à la casse. En Corée, il y a beaucoup de marque de la voiture fabriquée(Hyundai, Kia, et etc). Et, la plupart des Coréens ont tendance à privilégier les nouvelles voitures. Pourtant, les débutants de société achètent davantage de voitures d’occasion que de nouvelles. Quand nous le prenons, il nous faut de tenir compte de certaines conditions importantes :  
+**1. prix**  
+**2. couple**  
+**3. consommation de carburant**  
+  
+S'il est ainsi, dans ce projet, nous observera désormais diviser en 3 parties,  
+  
+**1ème partie**  
+**Hypothèse**  
+1-1. Hypothèse nulle (H0) : le prix de la voiture le prix de la voiture de l'automatique est même que celui de la manuelle   
+1-2. Hypothèse alternative (H1) : le prix de la voiture le prix de la voiture de l'automatique est différent que celui de la manuelle  
+**problèmatique**  
+1-1. Est-ce qu'il est en loi normale de chaque groupe (la manuelle et l'automatique sur le prix) ?   
+1-2. Est-ce que deux groupes (la manuelle et l'automatique sur le prix) sont en homoscédasticité ?   
+1-3. Est-ce qu'il y a la différence de prix de la voiture sur la boite de vitesse entre la manuelle et l'automatique ?(pour obtneir une p-valeur)   
+1-4. Combien de t-valuer se situe sur un histogramme après avoir fait le permutation test ?   
+1-5. Est-ce que la p-valuer chenge après avoir créé les données facultatives étant en loi normale ?   
+1-6. Est-ce que la t-valeur chenge après avoir créé les données facultatives étant en loi normale ?  
+   
+**2ème partie**  
+**Hypothèse**  
+2-1.Hypothèse nulle (H0) : la couple de la voiture de l'essence est même que celle du gazole  
+2-2. Hypothèse alternative (H1) : la couple de la voiture de l'essence est différente que celle du gazole  
+**problèmatique**  
+1-1. Est-ce qu'il est en loi normale de chaque groupe (l'essence et le gazole sur la couple) ?   
+1-2. Est-ce que deux groupes (l'essence et le gazole sur la couple) sont en homoscédasticité ?   
+1-3. Est-ce qu'il y a la différence de couple de la voiture sur la type de carburant entre l'essence et le gazole ?(pour obtenir une p-valeur)   
+1-4. Combien de t-valuer se situe sur un histogramme après avoir fait le permutation test ?   
+1-5. Est-ce que la p-valuer chenge après avoir créé les données facultatives étant en loi normale ?   
+1-6. Est-ce que la t-valeur chenge après avoir créé les données facultatives étant en loi normale ?  
+   
+**3ème partie**  
+**Hypothèse**  
+3-1. Hypothèse nulle (H0) : le poids de la voiture ne s'affecte pas à la consommation de carburant de la voiture  
+3-2. Hypothèse alternative (H1) : le poids de la voiture s'affecte à la consommation de carburant de la voiture   
+**Problèmatique**  
+3-1. Est-ce que la consomations de carburant subit l'influence sur le poids de la voiture(Est-ce que le poids de la voiture concerne la consommation de carburant de la voiture) ?   
+3-3. Comment distribuent la consommation de caburant et le poind de la voiture sur la nuage de points ?   
+3-3. Est-ce que nous pouvons prédire la valeur de consommation de caburant de la voiture, si nous savons un poids de voiture ?   
+   
+   
+**L'application des pakages et d'un fonction**
+```{r}
+library(ggplot2)
+library(dplyr)
+library(magrittr)
+library(readr)
+```
+  
+**Fonction pour obtenir le test de permutation**
+```{r}
+# generating an approximate sampling distribution of the t-statistic under the null hypothesis  
+# using a permutation test, and making reference to the histograms that result for the two cases.  
+# The t-statistic should be your test statistic, and you can extract it from the output of the call to t.test(...)  
+# by saving the result of t.test(...) as a variable (for example, v), and then accessing the element statistic  
+# within this variable using $ (for example, v$statistic). 
+
+permutation_t_test <- function(x1, x2)  {
+  diff_in_means <- mean(x1) - mean(x2)
+  n1 <- length(x1)
+  n2 <- length(x2)
+  variance_term <- sqrt( var(x1)/n1 + var(x2)/n2 )
+  return(diff_in_means/variance_term)
+}
+```
+  
+## 1ère partie : comparaison entre deux groupes
+### 1-1. Comparaison de prix concernant deux groupes : l'automatique et la manuelle, avec les données originales
+**Source des données**
+```{r}
+cars<-read.csv("carocca.csv")
+head(cars)
+```
+  
+  
+**Ranger les données et véfifier seulement les totales, les moyennes et les déviations normales de prix sur le type de boite de vitesse**
+```{r}
+prix_com <- cars %>% 
+  dplyr::group_by(boite.de.vitesse) %>%
+  dplyr::summarize(total=n(), meanprix = mean(prix), sd = sd(prix)) %>%
+  dplyr::ungroup()
+```
+
+```{r}
+prix_com #vérifier les données après avoir rangé les données
+```
+Tout d'abord, A travers de les données rangées, nous pouvons savoir les valeurs : les totales, les moyennes du prix et les déviations normales du prix pour la boite de vitesse (l'automatique et la manuelle)
+Pour l'automatique, la voiture est 272, la moyenne du prix apparait 2503 et la déviation normale du prix représente 1705.  
+Pour la manuelle, la voitre est 137, la moyenne du prix apparait 1484 et la déviation normale du prix représente 518.  
+  
+**Ranger les données pour diviser le type de boite de vitesse en deux : l'automatique et la manuelle**
+```{r}
+# Pour l'automatique, créer une colonne de l'automatique, si l'automatique, indiquer 0, si pas l'automaique, indiquer 1
+# Choisir deux facteurs : prix et automatique
+# filter seulment l'automatique lorsqu'il est 0
+a_cars <- cars %>%
+  dplyr::mutate(automatique = ifelse(boite.de.vitesse == "automatique", 0, 1)) %>%
+  dplyr::select(prix, automatique) %>%
+  dplyr::filter(automatique == 0) %>%
+  dplyr::ungroup()
+
+# Pour la manuelle, créer une colonne de la manuelle, si l'manuelle, indiquer 1, si pas la manuelle, indiquer 0
+# Choisir deux facteurs : prix et manuelle
+# filter seulment la manuelle lorsqu'il est 1
+b_cars <- cars %>%
+  dplyr::mutate(manuelle = ifelse(boite.de.vitesse == "manuelle", 1, 0)) %>%
+  dplyr::select(prix, manuelle) %>%
+  dplyr::filter(manuelle == 1) %>%
+  dplyr::ungroup()
+```
+
+**[Figure 1]. Comparaison de prix entre l'automatique et la manuelle par boxplot**
+```{r}
+ggplot2::ggplot(cars,
+                ggplot2::aes(x=boite.de.vitesse, y=prix)) +
+  ggplot2::geom_boxplot()
+```
+  
+Nous pouvons savoir que la zone de l'automatique distribue plus large que celle de la manuelle. Comme nous regardons ce boxplot, nous pouvons comprendre la peu différence de la moyenne entre deux valeurs. Pour vérifier de manière plus détaillée, nous dessinerons deux groupes dans un histogramme.  
+
+**[Figure 2]. Comparaison de prix entre l'automatique et la manuelle par histogramme**
+```{r}
+ggplot2::ggplot(cars, 
+                ggplot2::aes(x=prix)) +
+  ggplot2::geom_histogram(binwidth = 100, fill="skyblue", alpha=0.5, col="black") +
+  ggplot2::geom_vline(data=prix_com,
+                 ggplot2::aes(xintercept = meanprix), size=0.8, color="red", linetype = "dashed") +
+  ggplot2::facet_grid(boite.de.vitesse ~ .)
+```
+  
+**[Figure 3]. Comparaison de prix entre l'automatique et la manuelle par histogramme chevauchée deux groupes**
+```{r}
+ggplot2::ggplot(cars,
+                ggplot2::aes(x=prix, color = boite.de.vitesse)) +
+  ggplot2::geom_histogram(binwidth=100, position = "identity", alpha = 0.5, fill="white") +
+    ggplot2::geom_vline(data=prix_com,
+                 ggplot2::aes(xintercept = meanprix), color = "red", size=0.8, linetype = "dashed")
+```
+  
+Nous pouvons savoir le résultat de la différence de la moyenne du prix entre l'automatique et la manuelle.  
+Le prix de la moyenne de manuelle est plus gauche que celui de l'automatique.  
+C'est-à-dire, la moyenne de la couple de l'automatique est plus grande que celle de la manuelle.   
+En plus, nous pouvons savoir que deux histogrammes de moyenne de chaque groupe, ne sont pas en homoscédasticité. Nous pouvons observer que deux histogramme ne sont pas en loi normale. Et, la zone d'automatique est plus large.   
+  
+**Vérifier le résultat d'homoscédasticité entre deux groupes**
+```{r}
+var.test(prix~boite.de.vitesse, data=cars)
+```
+Nous pouvons vérifier l'homoscédastcitié de deux groupes par la fonction **var.test*.  
+Comme nous regardons le résultat, la p-valeur(2.2e-16) est inférieure à 0.05.  
+En d'autres termes, deux groupes ne sont pas d'homoscédasticité.
+  
+**Vérifier le résultat de t-test* entre deux groupes**
+```{r}
+t.test(prix~boite.de.vitesse, data=cars, var.equal=FALSE, conf.level=0.95)
+```
+Nous pouvons obtenir le résultat que la différence de deux groupes sont significatives car le p-valeur(2.2e-16) est inférieure à 0.05. S'il en est ainsi, nous ne pouvons pas adapter l'hypothèse nulle. La t-valeur indique que la t-valeur se situe de 0 (hypothèse nuelle) à droite 9.0611. La moyenne de l'écart maximal est faible : 797.9843 et élevé : 1240.4047. Il montre également que la moyenne de l'échantillon pour l'automatique, est 2503.143, et celle pour la manuelle, est 1483.949.   
+En d'autres termes, nous pouvons parler que la moyenne du prix entre deux groupes a la différence.  
+  
+
+**Permutation test**
+```{r}
+## Créer les 9999 samplings étant en loi normale de chaque groupe
+N_sampling <- 9999
+diff_ob <- mean(c(a_cars$prix, b_cars$prix))
+statistics <- rep(NA, N_sampling)
+for (i in 1:N_sampling) {
+  A_h0 <- rnorm(diff_ob) #construire en loi normale
+  B_h0 <- rnorm(diff_ob) #construire en loi normale
+  statistics[i] <- permutation_t_test(A_h0, B_h0)
+}
+```
+
+**[Figure 4]. Vérifier de t-valeur dans un histogramme**
+```{r}
+hist(statistics, freq=FALSE, breaks=80, xlim=c(-10,10))
+abline(v = permutation_t_test(a_cars$prix, b_cars$prix), col="red")
+```
+  
+Si nous réalisons l'expérience avec les données originales, nous pouvons observer que la distribution empirique est 0. Donc, on peut rejeter l’hypothèse nulle car la t-valeur(9.0611) n’existe pas graphiquement dans la loi noramle.  
+
+### 1-2. Comparaison de prix concernant deux groupes : l'automatique et la manuelle, avec 1000 sampling
+**Genération de fonctions de avec 1000 sampling**  
+Maintenant, nous ferons l'expérience que nous avons ajusté les données facultatives avec la moyenne et la déviation normale de données originales.  
+**Créer 1000 sample data de l'automatique et de la manuelle, avec 1000 sampling étant en loi normale**
+```{r}
+set.seed(123)
+# Pour l'automatique, créer 1000 sample data étant la même moyenne et la déviation normale
+auto <- rnorm(1000, mean(a_cars$prix), sd(a_cars$prix))
+# Pour la manuelle, créer 1000 sample date étant les même moyenne et les déviation normale
+manu <- rnorm(1000, mean(b_cars$prix), sd(b_cars$prix))
+set.seed(NULL)
+```
+**Joindre deux données sur une table**
+```{r}
+prix_ran <- data.frame(auto, manu)
+```
+
+**Rangement les données créés les 1000 sampling**
+Reconstruire et ajouter la colonne, et renommer le nom de colonne
+```{r}
+# Pour l'automatique, créer une colonne de la boite (automatique)
+# Choisir deux facteurs : auto et boite (automatique)
+# Renomer le facteur 'auto' en 'prix'
+# filter le prix étant supérieur à 0
+auto_com <- prix_ran %>%
+  dplyr::mutate(boite = c(auto = "automatique")) %>%
+  dplyr::select(auto, boite) %>%
+  dplyr::rename(prix=auto)%>%
+  dplyr::filter((prix> 0))%>%
+  dplyr::ungroup()
+
+# Pour la manuelle, créer une colonne de la boite (manuelle)
+# Choisir deux facteurs : manuelle et boite (manuelle)
+# Renomer le facteur 'auto' en 'prix'
+# filter le prix étant supérieur à 0
+manu_com <- prix_ran %>%
+  dplyr::mutate(boite = c(manu = "manuelle")) %>%
+  dplyr::select(manu, boite) %>%
+  dplyr::rename(prix = manu) %>%
+  dplyr::filter((prix> 0))%>%
+  dplyr::ungroup()
+```
+
+**Joindre les données en ligne**
+```{r}
+prix_comb <- bind_rows(auto_com, manu_com)
+```
+
+**vérifier les totales, les moyennes et les déviations normales de prix sur le type de boite de vitesse **
+```{r}
+print_prix <- prix_comb %>%
+  dplyr::group_by(boite) %>%
+  dplyr::summarise(total=n(), meanprix = mean(prix), sd = sd(prix)) %>%
+  dplyr::ungroup()
+```
+
+```{r}
+print_prix
+```
+Certainement, nous avons utilisé les moyennes et les déviations normales de données originales. Cependant, les valeurs sont un peu différentes.  
+Pour l'automatique, la voiture est 933, la moyenne du prix apparait 2762.198 et la déviation normale du prix représente 1497.9295.  
+Pour la manuelle, la voiture est 999, la moyenne du prix apparait 1507.559 et la déviation normale du prix représente 521.0445.
+   
+**[Figure 5] Comparaison les prix en deux histogrammes(automatique et manuelle)**
+```{r}
+ggplot2::ggplot(prix_comb, 
+                ggplot2::aes(x=prix)) +
+  ggplot2::geom_histogram(binwidth = 100, fill="skyblue", alpha=0.5, col="black") +
+  ggplot2::geom_vline(data=print_prix,
+                 ggplot2::aes(xintercept = meanprix), size=0.8, linetype = "dashed", color = "red") +
+  ggplot2::facet_grid(boite ~ .) + 
+  ggplot2::ggtitle("comparaison")
+```
+
+**[Figure 6] Comparaison les prix dans un histogramme chevauché deux groupes(automatique et manuelle)**
+```{r}
+ggplot2::ggplot(prix_comb,
+                ggplot2::aes(x=prix, color = boite)) +
+  ggplot2::geom_histogram(binwidth = 100, position = "identity", alpha = 0.7, fill="white") +
+    ggplot2::geom_vline(data=print_prix,
+                 ggplot2::aes(xintercept = meanprix), color = "red", size=0.8, linetype = "dashed")
+```
+  
+Comme les données originales, dans deux histogrammes, nous pouvons savoir la différence entre deux groupes. En plus, la moyenne de l'automatique est plus grande que celle de la manuelle car la ligne verticale de la moyenne de l'essence se situe plus gauche que celle du gazole. Seulement, cet histogramme est d'homoscédasticité de chaque groupe. Et, nous pouvons savoir que l'automatique distribue large. En revanche, la manuelle concentre.  
+
+**Vérifier le résultat d'homoscédasticité entre deux groupes (automatique vs manuelle)**
+```{r}
+var.test(prix~boite, data=prix_comb)
+```
+Nous pouvons vérifier l'homoscédastcitié de deux groupes par la fonction **var.test*.  
+Comme nous regardons le résultat, la p-valeur(2.2e-16) est inférieure à 0.05.  
+En d'autres termes, deux groupes ne sont pas d'homoscédasticité.  
+
+**Vérifier le résultat de t-test entre deux groupes (automatique vs manuelle)**
+```{r}
+t.test(prix ~ boite, data=prix_comb)
+```
+Nous pouvons obtenir le résultat que la différence de deux groupes sont significatives car le p-valeur(2.2e-16) est inférieure à 0.05. S'il en est ainsi, nous ne pouvons pas adapter l'hypothèse nulle. La t-valeur indique que la t-valeur se situe de 0 (hypothèse nuelle) à droite 24.25. La moyenne de l'écart maximal est faible : 1019.080 et élevé : 1019.256. Il montre également que l'échantillon de la moyenne pour l'automatique, est 2503.160, et celle pour la manuelle, est 1483.991.  
+En d'autres termes, nous pouvons parler que la moyenne du prix entre deux groupes a la différence.   
+
+**Permutation test**
+```{r}
+## Créer les 9999 samplings étant en loi normale de chaque groupe
+N_sampling <- 9999
+diff_ob <- mean(c(auto_com$prix, manu_com$prix))
+statistics <- rep(NA, N_sampling)
+for (i in 1:N_sampling) {
+  A_h0 <- rnorm(diff_ob)
+  B_h0 <- rnorm(diff_ob)
+  statistics[i] <- permutation_t_test(A_h0, B_h0)
+}
+```
+
+**[Figure 7].Vérifier de t-valeur dans un histogramme**
+```{r}
+hist(statistics, freq=FALSE, breaks=30, xlim=c(-30,30))
+abline(v = permutation_t_test(auto_com$prix, manu_com$prix), col="red")
+```
+  
+Si nous réalisons l'expérience avec les données originales, nous pouvons observer que la distribution empirique est 0. Donc, nous pouvons rejeter l’hypothèse nulle car nous la t-valeur (24.25) n’existe pas graphiquement dans la loi normale. En plus, la zone de distribution de données créant 1000 sampling est même que celle de données originales. Seulement la t-valeur est différente (1ers données: 9.0611, 2ème données : 24.25) car c'est ici où il n'exist que la différence de nombre d'observation.  
+  
+**Conclusion**  
+Quand nous comparons deux données originales et facultatives, nous pouvons savoir comme ci-dessous,  
+ 1. Pour le t-test de deux données, la p-valeur est significative, et est égale : 2.2e-16  
+ 2. Dans la distribution de la variable de t, les données facultatives sont plus grandes que les données originales (24.25 > 9.0611)  
+ 
+ Enfin, si nous créons les données, nous ne pouvons également pas adapter l'hypothèse nulle. Seulement nous pouvons savoir que la t-valeur de données avec 1000 sampling étant la loi nomrale, est plus grande que celle sur les données originales. En plus, pour deux hypothèses, nous rejetons les hypothèses nulles de deux données(originals et facultatives).  
+ 1ère et 2ème **p-valeurs** de t-test :  
+ - 1ère : 2.2e-16  
+ - 2ème : 2.2e-16
+  
+### 1-3. Comparaison de couples concernant deux groupes : essence et gazole, avec les données originales
+**Rangement des données**
+classifier deux facteurs : essence et gazole dans une colonne : type de carburant
+Ranger les données et véfifier seulement les totales, les moyennes et les déviations normales de couples sur le type de carburant
+```{r}
+# filter l'essence et le gazole dans la type de carburant
+couple_com <- cars %>% 
+  dplyr::filter(type.de.carburant == "essence" | type.de.carburant == "gazole") %>%
+  dplyr::ungroup()
+
+# réduire en une ligne sur les résultats : nombre total, couple de la moyenne et couple de la déviation normale sur couple
+couple_c <- couple_com %>% 
+  dplyr::group_by(type.de.carburant) %>% 
+  dplyr::summarize(total=n(), meancouple = mean(couple), sd=sd(couple)) %>%
+  dplyr::ungroup()
+```
+
+```{r}
+#Vérifier le nombre total, la moyenne de couple et la déviation normale de couple : essence et gazole
+couple_c
+```
+Tout d'abord, A travers de les données rangées, nous pouvons savoir les valeurs : le nombre total, les moyennes de la couple et les déviation normales de la couple pour la couple (essence et gazole)
+Pour l'essence, la voiture est 224, la moyenne de la couple apparait 18.4442, et la déviation normale de la couple représente 9.270899.  
+Pour le gazole, la voiture est 150, la moyenne de la couple apparait 36.7953, et la déviation normale de la couple représente 7.683298.  
+
+**Ranger les données pour diviser le type de carburant en deux : essence et gazole**
+```{r}
+# Pour l'essence, créer une colonne de l'essence, si l'essence, indiquer 0, si pas l'essence, indiquer 1
+# Choisir deux facteurs : couple et essence
+# filter seulment l'essence lorsqu'il est 0
+c_cars <- cars %>%
+  dplyr::mutate(essence = ifelse(type.de.carburant == "essence", 0, 1)) %>%
+  dplyr::select(couple, essence) %>%
+  dplyr::filter(essence == 0) %>%
+  dplyr::ungroup()
+
+
+# Pour le gazole, créer une colonne du gazole, si le gazole, indiquer 1, si pas le gazole, indiquer 0
+# Choisir deux facteurs : couple et gazole
+# filter seulment le gazole lorsqu'il est 1
+d_cars <- cars %>%
+  dplyr::mutate(gazole = ifelse(type.de.carburant == "gazole", 1, 0)) %>%
+  dplyr::select(couple, gazole) %>%
+  dplyr::filter(gazole == 1) %>%
+  dplyr:: ungroup()
+```
+
+**[Figure 8]. Comparaison de couples entre essence et gazole en boxplot**
+```{r}
+ggplot2::ggplot(couple_com,
+                ggplot2::aes(x=type.de.carburant, y=couple)) +
+  ggplot2::geom_boxplot()
+```
+  
+Nous pouvons savoir que la zone de l'essence distribue plus large que celle du gazole. Comme nous regardons ce boxplot, nous pouvons comprendre la peu différence de la moyenne de deux valeurs. Pour vérifier de manière plus détaillée, nous dessinerons deux groupes dans un histogramme.  
+
+**[Figure 9]. Comparaison de couples entre essence et gazole en histogramme**
+```{r}
+ggplot2::ggplot(couple_com, 
+                ggplot2::aes(x=couple)) +
+  ggplot2::geom_histogram(binwidth = 0.5, fill="skyblue", alpha=0.5, col="black") +
+  ggplot2::geom_vline(data=couple_c,
+                 ggplot2::aes(xintercept = meancouple), size = 1, color = "red", linetype = "dashed") +
+  ggplot2::facet_grid(type.de.carburant ~ .) + 
+  ggplot2::ggtitle("comparaison")
+```
+
+**[Figure 10]. Comparaison de couples entre l'automatique et la manuelle en histogramme chevauchée deux groupes**
+```{r}
+ggplot2::ggplot(couple_com,
+                ggplot2::aes(x=couple, color = type.de.carburant)) +
+  ggplot2::geom_histogram(binwidth= 0.5, position = "identity", alpha = 0.7, fill="white") +
+    ggplot2::geom_vline(data=couple_c,
+                 ggplot2::aes(xintercept = meancouple), color = "red", size=0.9, linetype = "dashed")
+```
+  
+Nous pouvons savoir le résultat de la différence de moyenne de la couple entre l'essence et le gazole.  
+La moyenne de la couple de l'essence est plus gauche que celle du gazole.  
+C'est-à-dire, la moyenne de la couple du gazole est plus grande que celle de l'essence.  
+En plus, nous pouvons savoir que deux histogrammes de moyenne de chaque groupe, ne sont pas en homoscédasticité. Nous pouvons observer que deux histogramme ne sont pas en loi normale.    
+
+**Vérifier le résultat d'homoscédasticité**
+```{r}
+var.test(couple~type.de.carburant, data=couple_com)
+```
+Nous pouvons également vérifier l'homoscédastcitié de deux groupes par la fonction **var.test*.  
+Comme nous regardons le résultat, la p-valeur(0.01391) est inférieure à 0.05.  
+En d'autres termes, deux groupes ne sont pas d'homoscédasticité.   
+
+**Vérifier le résultat de t-test**
+```{r}
+t.test(couple~type.de.carburant, data=couple_com, var.equal=FALSE, conf.level=0.95)
+```
+  
+Nous pouvons obtenir le résultat que la différence de deux groupes sont significatives car le p-valeur(2.2e-16) est inférieure à 0.05. S'il en est ainsi, nous ne pouvons pas adapter l'hypothèse nulle. La t-valeur indique que la t-valeur se situe de 0 (hypothèse nuelle) à gauche -20.815. La moyenne de l'écart maximal est faible : -20.08499 et élevé : -16.61729. Il montre également que la moyenne de l'échantillon pour l'essence, est 18.4442, et celle pour le gazole, est 36.79533.  
+En d'autres termes, nous pouvons parler que la moyenne de la couple entre deux groupes a la différence.  
+
+**Permutation test**
+```{r}
+## Créer les 9999 samplings étant en loi normale de chaque groupe
+N_sampling <- 9999
+diff_ob_2 <- mean(c(c_cars$couple, d_cars$couple))
+statistics_2 <- rep(NA, N_sampling)
+for (i in 1:N_sampling) {
+  C_h0 <- rnorm(diff_ob_2)
+  D_h0 <- rnorm(diff_ob_2)
+  statistics_2[i] <- permutation_t_test(C_h0, D_h0)
+}
+```
+
+**[Figure 11]. Vérifier de t-valeur dans un histogramme**
+```{r}
+hist(statistics_2, freq=FALSE, breaks=40, xlim=c(-30,30))
+abline(v=permutation_t_test(c_cars$couple,d_cars$couple), col="blue")
+```
+  
+Si nous réalisons l'expérience avec les données originales, nous pouvons observer que la distribution empirique est 0. Donc, nous pouvons rejeter l’hypothèse nulle car nous ne pouvons pas pas vérifier la t-valeur qui n’est pas graphiquement dans la distribution de la variable de t (-20.815).  
+
+### 1-4. Comparaison de couple concernant deux groupes : essence et gazole, avec 1000 sampling
+**Créer deux fonction : essence et gazole, avec 1000 sampling étant la loi noramle**
+```{r}
+set.seed(123)
+# Pour l'automatique, créer 1000 sample data étant les mêmes moyennes et les déviations normales
+essence <- rnorm(1000, mean(c_cars$couple), sd(c_cars$couple))
+# Pour l'automatique, créer 1000 sample data étant les mêmes moyennes et les déviations normales
+gazole <- rnorm(1000, mean(d_cars$couple), sd(d_cars$couple))
+set.seed(NULL)
+```
+
+**Joindre deux données **
+```{r}
+couple_ran <- data.frame(essence, gazole)
+```
+
+**Ranger et reconstruire et ajouter la colonne, et renommer le nom de colonne**
+```{r}
+# Pour l'essence, créer une colonne de l'essence
+# Choisir deux facteurs : essence et carburant
+# Renomer le facteur 'essence' en 'couple'
+# filter la couple étant supérieur à 0
+essence_com <- couple_ran %>%
+  dplyr::mutate(carburant = c(essence = "essence")) %>%
+  dplyr::select(essence, carburant) %>%
+  dplyr::rename(couple=essence)%>%
+  dplyr::filter((couple> 0))%>%
+  dplyr::ungroup()
+
+# Pour le gazole, créer une colonne du gazole
+# Choisir deux facteurs : gazole et carburant
+# Renomer le facteur 'gazole' en 'couple'
+# filter la couple étant supérieur à 0
+gazole_com <- couple_ran %>%
+  dplyr::mutate(carburant = c(gazole = "gazole")) %>%
+  dplyr::select(gazole, carburant) %>%
+  dplyr::rename(couple = gazole) %>%
+  dplyr::filter((couple> 0))%>%
+  dplyr::ungroup()
+```
+
+**Joindre les données en ligne**
+```{r}
+couple_comb <- bind_rows(essence_com, gazole_com)
+```
+
+**Vérifier les totales, les moyennes et les déviations normales de couples sur le type de boite de vitesse **
+```{r}
+print_couple <- couple_comb %>%
+  dplyr::group_by(carburant) %>%
+  dplyr::summarise(total=n(), meancouple = mean(couple), sd = sd(couple)) %>%
+  dplyr::ungroup()
+```
+
+```{r}
+#vérifier les résultats : nombre total, moyenne de la couple et déviation normale de la couple de chaque groupe : essence et gazole
+print_couple
+```
+Certainement, nous avons utilisé les moyennes et les déviations normales de données originales. Cependant, les valeurs sont un peu différentes.  
+Pour l'essence, la voiture est 980, la moyenne de la couple apparait 19.02535 et la déviation normale de la couple représente 8.764726.  
+Pour le gazole, la voiture est 1000, la moyenne de la couple apparait 37.12161 et la déviation normale de la couple représente 7.757627.  
+
+**[Figure 12] Comparaison les couples entre essence et gazole par deux histogrammes**
+```{r}
+ggplot2::ggplot(couple_comb,
+                ggplot2::aes(x=couple)) +
+  ggplot2::geom_histogram(binwidth = 0.5, fill="skyblue", alpha=0.5, col="black") +
+  ggplot2::geom_vline(data=print_couple,
+                 ggplot2::aes(xintercept = meancouple), size=0.8, color="red", linetype = "dashed") +
+  ggplot2::facet_grid(carburant ~ .) + 
+  ggplot2::ggtitle("comparaison")
+```
+
+**[Figure 13] Comparaison les couples entre essence et gazole dans un histogramme chevauché deux groupes**
+```{r}
+ggplot2::ggplot(couple_comb,
+                ggplot2::aes(x=couple, color = carburant)) +
+  ggplot2::geom_histogram(binwidth=0.5, position = "identity", alpha = 0.5, fill="white") +
+    ggplot2::geom_vline(data=print_couple,
+                 ggplot2::aes(xintercept = meancouple), color = "red", size=0.8, linetype = "dashed")
+```
+  
+Comme les données originales, dans deux histogrammes, nous pouvons savoir la différence entre deux groupes. En plus, la moyenne du gazole est plus grande que celle de l'essence car la ligne verticale de la moyenne de l'essence se situe plus gauche que celle du gazole. Seulement, cet histogramme est d'homoscédasticité de chaque groupe.  
+
+** Vérifier le résultat d'homoscédasticité entre essence et gazole**
+```{r}
+var.test(couple~carburant, data=couple_comb)
+```
+Nous pouvons vérifier l'homoscédastcitié de deux groupes par la fonction **var.test*.  
+Comme nous regardons le résultat, la p-valeur(0.0001259) est inférieure à 0.05.  
+En d'autres termes, deux groupes ne sont pas d'homoscédasticité.   
+
+**Vérifier le résultat de t-test entre essence et gazole**
+```{r}
+t.test(couple ~ carburant, data=couple_comb)
+```
+Nous pouvons obtenir le résultat que la différence de deux groupes sont significatives car le p-valeur(2.2e-16) est inférieure à 0.05. S'il en est ainsi, nous ne pouvons pas adapter l'hypothèse nulle. La t-valeur indique que la t-valeur se situe de 0 (hypothèse nuelle) à gauche -48.613. La moyenne de l'écart maximal est faible : -18.82631 et élevé : -17.36621. Il montre également que la moyenne de l'échantillon pour l'essence, est 19.02535, et celle pour le gazole, est 37.12161
+En d'autres termes, nous pouvons parler que la moyenne de la couple entre deux groupes a la différence.  
+
+**Permutation test**
+```{r}
+## Créer les 9999 samplings étant en loi normale de chaque groupe
+N_sampling <- 9999
+diff_ob <- mean(c(essence_com$couple, gazole_com$couple))
+statistics <- rep(NA, N_sampling)
+for (i in 1:N_sampling) {
+  A_h0 <- rnorm(diff_ob)
+  B_h0 <- rnorm(diff_ob)
+  statistics[i] <- permutation_t_test(A_h0, B_h0)
+}
+```
+
+**[Figure 14]. Vérifier de t-valeur dans un histogramme**
+```{r}
+# Vérifier de valeur de cofficient dans un historamme
+hist(statistics, freq=FALSE, breaks=20, xlim=c(-60,60))
+abline(v = permutation_t_test(essence_com$couple, gazole_com$couple), col="blue")
+```
+  
+Si nous réalisons l'expérience avec les données originales, nous pouvons observer que la distribution empirique est 0. Donc, nous pouvons rejeter l’hypothèse nulle. La t-valeur (-48.613) n’existe pas graphiquement dans la loi normale. En plus, la zone de distribution de données créant 1000 sampling est même que celle de données originales. Seulement la t-valeur est différente (1ers données: -20.815, 2ème données : -48.613) car c'est ici où il n'exist que la différence de nombre d'observation.  
+  
+   
+**Conclusion**  
+Quand nous comparons deux données originales et facultatives, nous pouvons savoir comme ci-dessous,   
+ 1. Pour le résultat de t-test de deux données, la p-valeur est significative, et est égale : 2.2e-16.  
+ 2. Pour la t-valeur, les données facultatives sont plus grandes que les données originales (-20.815 > -48.613).  
+
+ Enfin, si nous créons les données, nous ne pouvons également pas adapter l'hypothèse nulle. Seulement nous pouvons savoir que la t-valeur de données avec 1000 sampling étant la loi nomrale, est plus grande que celle sur les données originales. En plus, pour deux hypothèses, nous rejetons les hypothèses nulles de deux données(originals et facultatives).  
+ 1ère et 2ème **p-valeurs** de t-test :  
+ - 1ère : 2.2e-16  
+ - 2ème : 2.2e-16 
+   
+## 2ème partie : l'analyse de regression
+### 2-1. Analyse de corrélation entre la consommation de carburant et le poids de voiture
+** Rangement les données**
+```{r}
+r_cars <- cars %>%
+  dplyr::select(poids, consommation.de.carburant) %>%
+  dplyr::filter(consommation.de.carburant > 0) %>% #supprimer la valeur nulle
+  dplyr::ungroup()
+```
+
+** Vérifier le résultat d'analyse de regression**
+```{r}
+m <- lm(consommation.de.carburant~poids, data=r_cars)
+summary(m)
+```
+Nous pouvons savoir que le poids de la voiture et la consommation de carburant sont très significatifs car la p-valeur(2e-16***) est inférieure à 0.05.  
+En d'autres termes, nous pouvons comprendre que plus le poids de la voiture est gros, plus la consommation de carburant de la voiture réduit (est mauvaise). Et, ce résultat explique environ 42% (R-sqaured : 0.4211).  
+Ensuite, nous pouvons savoir certaines valeurs,  
+Le y-intercept est 20.1337296, la pente est -0.004995.   
+En plus, nous pouvons prédire la valeur de la consommation de carburant comme cela :   
+**consommation de carburant = -0.004995 X poids + 20.1337296.**  
+Et,La forme de la ligne parait la diagonale de haut en bas comme la graphie ci-dessous ;   
+  
+**[Figure 15]. le résultat à travers de la nuage de points**
+```{r}
+#vérifier l'analyse de regression par la nuage de points
+ggplot2::ggplot(r_cars,
+                ggplot2::aes(y=consommation.de.carburant, x=poids)) +
+  ggplot2::geom_point(aes(y=consommation.de.carburant, x=poids)) +
+  ggplot2::geom_abline(slope=coef(m)[2], intercept=coef(m)[1], colour="red")+
+  ggplot2::geom_smooth(method=lm)
+```
+  
+Comme je l'ai dit auparavant, nous pouvons généralement observer que plus le poids augmente, plus la consommation de carburant réduit. Cependant, comme nous le observons, dans la zone de poind de la voiture étant inférieure à 1000. kg, bien que le poids soit petit, la consommation de carburant de certaines voitures n'est pas bien. Nous pouvons supposer que certaines voitures subissent l'influence de les autres conditions. Comme nous analysons le résultat d'analyse de regression ci-dessus, cette analyse de regression nous explique environ 42%.  
+  
+**Prédiction de consommation de carburant sur le poids de voitures**
+```{r}
+new_car_1 <- data.frame(poids=3222)
+predict(m, new_car_1)
+```
+Nous pouvons prédire un résultat que nous voulons. Si nous pouvons savoir la consommation de carburant, nous pouvons savoir le résultat de prédictition. Lorsque le poids de la voiture est 3222 kg, la consommation de carburant représente 4.038262.  
+C'est-à-dire, si le poids de voiture est 3222 kg, la consommation de carburant de cette voiture prend 4.038262km/L.
+
+##Conclusion
+Jusqu'à mainentant, nous avons examiné 3 résultats :
+1. Le prix entre l'automatique et la manuelle est différent  
+2. La couple entre l'essence et le gazole est différente  
+3. Plus le poids de la voiture augmente, plus la consommation de carburant de la voiture est mauvaise.  
+   
+**En d'autres termes, nous pouvons rejeter toutes les 3 hypothèses.**  
+   
+Et, quand nous avons observé la différence entre deux groupes dans les données originales, bien que la distribution ne soit pas en loi normale, nous avons obtenu le même résultat par t-test. Et, nous avons observé le résultat après avoir créé les données étant en loi normale. Le résultat aussi, il est que deux données ne sont pas différente sur p-valuer. Cependant, il n'est que différent sur la t-valeur. C'est-à-dire, nous avons pu parler que plus le nombre d'obsevation augemente, plus la t-value est grande.  
+Ensuite, nous pouvons supposer que plus le poids de la voiture augmente, plus la consommation de carburant de la votiure est mauvaise, par l'analyse de regression. Et, à travers du résultat, nous pouvons obtenir la valeur de consommation de carburant sur le poids facultatif que nous voulons. Pourtant, nous ne pouvons pas parler que ce résultat est parfait pour expliquer la corrélation entre deux facteurs (poids et consommation de carburant). Car nous avons déjà observé la graphie et le résultat de Multiple R-squared (0.4211) : 42% de force d'explication. S'il en ainsi est, nous avons besoin de consider les autres conditions pour influencer à la consommation de carburant. 
