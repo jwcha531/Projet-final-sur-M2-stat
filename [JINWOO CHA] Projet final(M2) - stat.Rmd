@@ -15,7 +15,7 @@ S'il est ainsi, dans ce projet, nous observera désormais diviser en 3 parties,
   
 **1ème partie**  
 **Hypothèse**  
-1-1. Hypothèse nulle (H0) : le prix de la voiture le prix de la voiture de l'automatique est même que celui de la manuelle   
+  1-1. Hypothèse nulle (H0) : le prix de la voiture le prix de la voiture de l'automatique est même que celui de la manuelle   
 1-2. Hypothèse alternative (H1) : le prix de la voiture le prix de la voiture de l'automatique est différent que celui de la manuelle  
 **problèmatique**  
 1-1. Est-ce qu'il est en loi normale de chaque groupe (la manuelle et l'automatique sur le prix) ?   
@@ -23,11 +23,11 @@ S'il est ainsi, dans ce projet, nous observera désormais diviser en 3 parties,
 1-3. Est-ce qu'il y a la différence de prix de la voiture sur la boite de vitesse entre la manuelle et l'automatique ?(pour obtneir une p-valeur)   
 1-4. Combien de t-valuer se situe sur un histogramme après avoir fait le permutation test ?   
 1-5. Est-ce que la p-valuer chenge après avoir créé les données facultatives étant en loi normale ?   
-1-6. Est-ce que la t-valeur chenge après avoir créé les données facultatives étant en loi normale ?  
+1-6. Est-ce que la t-valeur(statistics) chenge après avoir créé les données facultatives étant en loi normale ?  
    
 **2ème partie**  
 **Hypothèse**  
-2-1.Hypothèse nulle (H0) : la couple de la voiture de l'essence est même que celle du gazole  
+2-1. Hypothèse nulle (H0) : la couple de la voiture de l'essence est même que celle du gazole  
 2-2. Hypothèse alternative (H1) : la couple de la voiture de l'essence est différente que celle du gazole  
 **problèmatique**  
 1-1. Est-ce qu'il est en loi normale de chaque groupe (l'essence et le gazole sur la couple) ?   
@@ -35,7 +35,7 @@ S'il est ainsi, dans ce projet, nous observera désormais diviser en 3 parties,
 1-3. Est-ce qu'il y a la différence de couple de la voiture sur la type de carburant entre l'essence et le gazole ?(pour obtenir une p-valeur)   
 1-4. Combien de t-valuer se situe sur un histogramme après avoir fait le permutation test ?   
 1-5. Est-ce que la p-valuer chenge après avoir créé les données facultatives étant en loi normale ?   
-1-6. Est-ce que la t-valeur chenge après avoir créé les données facultatives étant en loi normale ?  
+1-6. Est-ce que la t-valeur(statistics) chenge après avoir créé les données facultatives étant en loi normale ?  
    
 **3ème partie**  
 **Hypothèse**  
@@ -72,12 +72,11 @@ permutation_t_test <- function(x1, x2)  {
 }
 ```
   
-## 1ère partie : comparaison entre deux groupes
+## 1ère partie : le prix de la voiture entre l'automatique et la manuelle
 ### 1-1. Comparaison de prix concernant deux groupes : l'automatique et la manuelle, avec les données originales
 **Source des données**
 ```{r}
 cars<-read.csv("carocca.csv")
-head(cars)
 ```
   
   
@@ -145,7 +144,7 @@ ggplot2::ggplot(cars,
                  ggplot2::aes(xintercept = meanprix), color = "red", size=0.8, linetype = "dashed")
 ```
   
-Nous pouvons savoir le résultat de la différence de la moyenne du prix entre l'automatique et la manuelle.  
+Dans les figures 2 et 3, nous pouvons savoir le résultat de la différence de la moyenne du prix entre l'automatique et la manuelle.  
 Le prix de la moyenne de manuelle est plus gauche que celui de l'automatique.  
 C'est-à-dire, la moyenne de la couple de l'automatique est plus grande que celle de la manuelle.   
 En plus, nous pouvons savoir que deux histogrammes de moyenne de chaque groupe, ne sont pas en homoscédasticité. Nous pouvons observer que deux histogramme ne sont pas en loi normale. Et, la zone d'automatique est plus large.   
@@ -162,7 +161,7 @@ En d'autres termes, deux groupes ne sont pas d'homoscédasticité.
 ```{r}
 t.test(prix~boite.de.vitesse, data=cars, var.equal=FALSE, conf.level=0.95)
 ```
-Nous pouvons obtenir le résultat que la différence de deux groupes sont significatives car le p-valeur(2.2e-16) est inférieure à 0.05. S'il en est ainsi, nous ne pouvons pas adapter l'hypothèse nulle. La t-valeur indique que la t-valeur se situe de 0 (hypothèse nuelle) à droite 9.0611. La moyenne de l'écart maximal est faible : 797.9843 et élevé : 1240.4047. Il montre également que la moyenne de l'échantillon pour l'automatique, est 2503.143, et celle pour la manuelle, est 1483.949.   
+Nous pouvons obtenir le résultat que la différence de deux groupes sont significatives car le p-valeur(2.2e-16) est inférieure à 0.05. S'il en est ainsi, nous ne pouvons pas adapter l'hypothèse nulle. La t-valeur(statistics) indique que la t-valeur(statistics) se situe de 0 (hypothèse nuelle) à droite 9.0611. La moyenne de l'écart maximal est faible : 797.9843 et élevé : 1240.4047. Il montre également que la moyenne de l'échantillon pour l'automatique, est 2503.143, et celle pour la manuelle, est 1483.949.   
 En d'autres termes, nous pouvons parler que la moyenne du prix entre deux groupes a la différence.  
   
 
@@ -179,13 +178,13 @@ for (i in 1:N_sampling) {
 }
 ```
 
-**[Figure 4]. Vérifier de t-valeur dans un histogramme**
+**[Figure 4]. Vérifier de t-valeur(statistics) dans un histogramme**
 ```{r}
 hist(statistics, freq=FALSE, breaks=80, xlim=c(-10,10))
 abline(v = permutation_t_test(a_cars$prix, b_cars$prix), col="red")
 ```
   
-Si nous réalisons l'expérience avec les données originales, nous pouvons observer que la distribution empirique est 0. Donc, on peut rejeter l’hypothèse nulle car la t-valeur(9.0611) n’existe pas graphiquement dans la loi noramle.  
+Si nous réalisons l'expérience avec les données originales, nous pouvons observer que la distribution empirique est 0. Donc, nous pouvons rejeter l’hypothèse nulle car la t-valeur(statistics : 9.0611) n’existe pas graphiquement dans la loi noramle.  
 
 ### 1-2. Comparaison de prix concernant deux groupes : l'automatique et la manuelle, avec 1000 sampling
 **Genération de fonctions de avec 1000 sampling**  
@@ -246,7 +245,7 @@ print_prix <- prix_comb %>%
 ```{r}
 print_prix
 ```
-Certainement, nous avons utilisé les moyennes et les déviations normales de données originales. Cependant, les valeurs sont un peu différentes.  
+Certainement, nous avons utilisé les moyennes et les déviations normales de données originales. Bien que les valeurs soient un peu différentesm, nous ne pouvons pas parler parfaitement que deux valeurs(moyenne et déviation normale) sont différent.  
 Pour l'automatique, la voiture est 933, la moyenne du prix apparait 2762.198 et la déviation normale du prix représente 1497.9295.  
 Pour la manuelle, la voiture est 999, la moyenne du prix apparait 1507.559 et la déviation normale du prix représente 521.0445.
    
@@ -270,7 +269,7 @@ ggplot2::ggplot(prix_comb,
                  ggplot2::aes(xintercept = meanprix), color = "red", size=0.8, linetype = "dashed")
 ```
   
-Comme les données originales, dans deux histogrammes, nous pouvons savoir la différence entre deux groupes. En plus, la moyenne de l'automatique est plus grande que celle de la manuelle car la ligne verticale de la moyenne de l'essence se situe plus gauche que celle du gazole. Seulement, cet histogramme est d'homoscédasticité de chaque groupe. Et, nous pouvons savoir que l'automatique distribue large. En revanche, la manuelle concentre.  
+Comme les données originales, dans deux histogrammes dans les figures 5 et 6, nous pouvons savoir la différence entre deux groupes. En plus, la moyenne de l'automatique est plus grande que celle de la manuelle car la ligne verticale de la moyenne de la manuelle se situe plus gauche que celle de l'automatique. Seulement, cet histogramme est d'homoscédasticité de chaque groupe. Et, nous pouvons savoir que l'automatique distribue large. En revanche, la manuelle concentre.  
 
 **Vérifier le résultat d'homoscédasticité entre deux groupes (automatique vs manuelle)**
 ```{r}
@@ -284,7 +283,7 @@ En d'autres termes, deux groupes ne sont pas d'homoscédasticité.
 ```{r}
 t.test(prix ~ boite, data=prix_comb)
 ```
-Nous pouvons obtenir le résultat que la différence de deux groupes sont significatives car le p-valeur(2.2e-16) est inférieure à 0.05. S'il en est ainsi, nous ne pouvons pas adapter l'hypothèse nulle. La t-valeur indique que la t-valeur se situe de 0 (hypothèse nuelle) à droite 24.25. La moyenne de l'écart maximal est faible : 1019.080 et élevé : 1019.256. Il montre également que l'échantillon de la moyenne pour l'automatique, est 2503.160, et celle pour la manuelle, est 1483.991.  
+Nous pouvons obtenir le résultat que la différence de deux groupes sont significatives car le p-valeur(2.2e-16) est inférieure à 0.05. S'il en est ainsi, nous ne pouvons pas adapter l'hypothèse nulle. La t-valeur(statistics) indique que la t-valeur(statistics) se situe de 0 (hypothèse nuelle) à droite 24.25. La moyenne de l'écart maximal est faible : 1019.080 et élevé : 1019.256. Il montre également que l'échantillon de la moyenne pour l'automatique, est 2503.160, et celle pour la manuelle, est 1483.991.  
 En d'autres termes, nous pouvons parler que la moyenne du prix entre deux groupes a la différence.   
 
 **Permutation test**
@@ -300,25 +299,32 @@ for (i in 1:N_sampling) {
 }
 ```
 
-**[Figure 7].Vérifier de t-valeur dans un histogramme**
+**[Figure 7].Vérifier de t-valeur(statistics) dans un histogramme**
 ```{r}
 hist(statistics, freq=FALSE, breaks=30, xlim=c(-30,30))
 abline(v = permutation_t_test(auto_com$prix, manu_com$prix), col="red")
 ```
   
-Si nous réalisons l'expérience avec les données originales, nous pouvons observer que la distribution empirique est 0. Donc, nous pouvons rejeter l’hypothèse nulle car nous la t-valeur (24.25) n’existe pas graphiquement dans la loi normale. En plus, la zone de distribution de données créant 1000 sampling est même que celle de données originales. Seulement la t-valeur est différente (1ers données: 9.0611, 2ème données : 24.25) car c'est ici où il n'exist que la différence de nombre d'observation.  
-  
+Si nous réalisons l'expérience avec les données facultatives (1000 sampling), nous pouvons observer que la distribution empirique est 0. Donc, nous pouvons rejeter l’hypothèse nulle car nous la t-valeur(statistics : 24.25) n’existe pas graphiquement dans la loi normale. En plus, la zone de distribution de données créant 1000 sampling est même que celle de données originales. Seulement la t-valeur(statistics) est différente (1ères données: 9.0611, 2ème données : 24.25) car c'est ici où il n'exist que la différence de nombre d'observation. Car, dans les données facultatives (1000 sampling), nous avons utilisé les mêmes moyennes et déviations normales de données originales.  
+   
 **Conclusion**  
 Quand nous comparons deux données originales et facultatives, nous pouvons savoir comme ci-dessous,  
- 1. Pour le t-test de deux données, la p-valeur est significative, et est égale : 2.2e-16  
- 2. Dans la distribution de la variable de t, les données facultatives sont plus grandes que les données originales (24.25 > 9.0611)  
+ 1. Pour le t-test de deux données, la p-valeur est significative, et est égale : 2.2e-16. Car nous avons utilisé les mêmes moyennes et déviations normales de chaque groupe.  
+ 2. Dans la distribution de la t-valeur(statistics), les données facultatives sont plus grandes que les données originales (24.25 > 9.0611)  
  
- Enfin, si nous créons les données, nous ne pouvons également pas adapter l'hypothèse nulle. Seulement nous pouvons savoir que la t-valeur de données avec 1000 sampling étant la loi nomrale, est plus grande que celle sur les données originales. En plus, pour deux hypothèses, nous rejetons les hypothèses nulles de deux données(originals et facultatives).  
- 1ère et 2ème **p-valeurs** de t-test :  
- - 1ère : 2.2e-16  
- - 2ème : 2.2e-16
-  
-### 1-3. Comparaison de couples concernant deux groupes : essence et gazole, avec les données originales
+ Enfin, si nous créons les données, nous ne pouvons également pas adapter l'hypothèse nulle. Seulement nous pouvons savoir que la t-valeur(statistics) de données avec 1000 sampling étant la loi nomrale, est plus grande que celle sur les données originales. En plus, nous rejetons l'hypothèse nulle de deux données(originals et facultatives).  
+ 1ère et 2ème **p-valeurs** et **t-valeurs** de t-test :  
+```{r,include=FALSE}
+resultat <- as.table(matrix(c(as.character(2.2e-16), as.character(2.2e-16), 9.0611, 24.25), nrow=2, byrow=TRUE,
+                dimnames=list (c("p-valeur", "t-valeur"),
+                               c("orignal", "1000sampling")))) 
+```
+```{r}
+knitr::kable(resultat)
+```
+   
+##2ème partie : couple de la voiture entre l'essence et le gazole
+### 2-1. Comparaison de couples concernant deux groupes : essence et gazole, avec les données originales
 **Rangement des données**
 classifier deux facteurs : essence et gazole dans une colonne : type de carburant
 Ranger les données et véfifier seulement les totales, les moyennes et les déviations normales de couples sur le type de carburant
@@ -394,7 +400,7 @@ ggplot2::ggplot(couple_com,
                  ggplot2::aes(xintercept = meancouple), color = "red", size=0.9, linetype = "dashed")
 ```
   
-Nous pouvons savoir le résultat de la différence de moyenne de la couple entre l'essence et le gazole.  
+Dans les figure 9 et 10, nous pouvons savoir le résultat de la différence de moyenne de la couple entre l'essence et le gazole.  
 La moyenne de la couple de l'essence est plus gauche que celle du gazole.  
 C'est-à-dire, la moyenne de la couple du gazole est plus grande que celle de l'essence.  
 En plus, nous pouvons savoir que deux histogrammes de moyenne de chaque groupe, ne sont pas en homoscédasticité. Nous pouvons observer que deux histogramme ne sont pas en loi normale.    
@@ -412,7 +418,7 @@ En d'autres termes, deux groupes ne sont pas d'homoscédasticité.
 t.test(couple~type.de.carburant, data=couple_com, var.equal=FALSE, conf.level=0.95)
 ```
   
-Nous pouvons obtenir le résultat que la différence de deux groupes sont significatives car le p-valeur(2.2e-16) est inférieure à 0.05. S'il en est ainsi, nous ne pouvons pas adapter l'hypothèse nulle. La t-valeur indique que la t-valeur se situe de 0 (hypothèse nuelle) à gauche -20.815. La moyenne de l'écart maximal est faible : -20.08499 et élevé : -16.61729. Il montre également que la moyenne de l'échantillon pour l'essence, est 18.4442, et celle pour le gazole, est 36.79533.  
+Nous pouvons obtenir le résultat que la différence de deux groupes sont significatives car le p-valeur(2.2e-16) est inférieure à 0.05. S'il en est ainsi, nous ne pouvons pas adapter l'hypothèse nulle. La t-valeur(statistics) indique que la t-valeur(statistics) se situe de 0 (hypothèse nuelle) à gauche -20.815. La moyenne de l'écart maximal est faible : -20.08499 et élevé : -16.61729. Il montre également que la moyenne de l'échantillon pour l'essence, est 18.4442, et celle pour le gazole, est 36.79533.  
 En d'autres termes, nous pouvons parler que la moyenne de la couple entre deux groupes a la différence.  
 
 **Permutation test**
@@ -428,15 +434,15 @@ for (i in 1:N_sampling) {
 }
 ```
 
-**[Figure 11]. Vérifier de t-valeur dans un histogramme**
+**[Figure 11]. Vérifier de t-valeur(statistics) dans un histogramme**
 ```{r}
 hist(statistics_2, freq=FALSE, breaks=40, xlim=c(-30,30))
 abline(v=permutation_t_test(c_cars$couple,d_cars$couple), col="blue")
 ```
   
-Si nous réalisons l'expérience avec les données originales, nous pouvons observer que la distribution empirique est 0. Donc, nous pouvons rejeter l’hypothèse nulle car nous ne pouvons pas pas vérifier la t-valeur qui n’est pas graphiquement dans la distribution de la variable de t (-20.815).  
+Si nous réalisons l'expérience avec les données originales, nous pouvons observer que la distribution empirique est 0. Donc, nous pouvons rejeter l’hypothèse nulle car nous ne pouvons pas pas vérifier la t-valeur(statistics) qui n’est pas graphiquement dans la distribution de t-valeur(statistics : -20.815).  
 
-### 1-4. Comparaison de couple concernant deux groupes : essence et gazole, avec 1000 sampling
+### 2-2. Comparaison de couple concernant deux groupes : essence et gazole, avec 1000 sampling
 **Créer deux fonction : essence et gazole, avec 1000 sampling étant la loi noramle**
 ```{r}
 set.seed(123)
@@ -494,7 +500,7 @@ print_couple <- couple_comb %>%
 #vérifier les résultats : nombre total, moyenne de la couple et déviation normale de la couple de chaque groupe : essence et gazole
 print_couple
 ```
-Certainement, nous avons utilisé les moyennes et les déviations normales de données originales. Cependant, les valeurs sont un peu différentes.  
+Certainement, nous avons utilisé les moyennes et les déviations normales de données originales. Bien que les valeurs soient un peu différentesm, nous ne pouvons pas parler parfaitement que deux valeurs(moyenne et déviation normale) sont différent.  
 Pour l'essence, la voiture est 980, la moyenne de la couple apparait 19.02535 et la déviation normale de la couple représente 8.764726.  
 Pour le gazole, la voiture est 1000, la moyenne de la couple apparait 37.12161 et la déviation normale de la couple représente 7.757627.  
 
@@ -518,7 +524,7 @@ ggplot2::ggplot(couple_comb,
                  ggplot2::aes(xintercept = meancouple), color = "red", size=0.8, linetype = "dashed")
 ```
   
-Comme les données originales, dans deux histogrammes, nous pouvons savoir la différence entre deux groupes. En plus, la moyenne du gazole est plus grande que celle de l'essence car la ligne verticale de la moyenne de l'essence se situe plus gauche que celle du gazole. Seulement, cet histogramme est d'homoscédasticité de chaque groupe.  
+Comme les données originales, dans deux histogrammes sur les figures 12 et 13, nous pouvons savoir la différence entre deux groupes. En plus, la moyenne du gazole est plus grande que celle de l'essence car la ligne verticale de la moyenne de l'essence se situe plus gauche que celle du gazole. Seulement, cet histogramme est d'homoscédasticité de chaque groupe.  
 
 ** Vérifier le résultat d'homoscédasticité entre essence et gazole**
 ```{r}
@@ -532,7 +538,7 @@ En d'autres termes, deux groupes ne sont pas d'homoscédasticité.
 ```{r}
 t.test(couple ~ carburant, data=couple_comb)
 ```
-Nous pouvons obtenir le résultat que la différence de deux groupes sont significatives car le p-valeur(2.2e-16) est inférieure à 0.05. S'il en est ainsi, nous ne pouvons pas adapter l'hypothèse nulle. La t-valeur indique que la t-valeur se situe de 0 (hypothèse nuelle) à gauche -48.613. La moyenne de l'écart maximal est faible : -18.82631 et élevé : -17.36621. Il montre également que la moyenne de l'échantillon pour l'essence, est 19.02535, et celle pour le gazole, est 37.12161
+Nous pouvons obtenir le résultat que la différence de deux groupes sont significatives car le p-valeur(2.2e-16) est inférieure à 0.05. S'il en est ainsi, nous ne pouvons pas adapter l'hypothèse nulle. La t-valeur(statistics) indique que la t-valeur(statistics) se situe de 0 (hypothèse nuelle) à gauche -48.613. La moyenne de l'écart maximal est faible : -18.82631 et élevé : -17.36621. Il montre également que la moyenne de l'échantillon pour l'essence, est 19.02535, et celle pour le gazole, est 37.12161
 En d'autres termes, nous pouvons parler que la moyenne de la couple entre deux groupes a la différence.  
 
 **Permutation test**
@@ -548,29 +554,34 @@ for (i in 1:N_sampling) {
 }
 ```
 
-**[Figure 14]. Vérifier de t-valeur dans un histogramme**
+**[Figure 14]. Vérifier de t-valeur(statistics) dans un histogramme**
 ```{r}
 # Vérifier de valeur de cofficient dans un historamme
 hist(statistics, freq=FALSE, breaks=20, xlim=c(-60,60))
 abline(v = permutation_t_test(essence_com$couple, gazole_com$couple), col="blue")
 ```
   
-Si nous réalisons l'expérience avec les données originales, nous pouvons observer que la distribution empirique est 0. Donc, nous pouvons rejeter l’hypothèse nulle. La t-valeur (-48.613) n’existe pas graphiquement dans la loi normale. En plus, la zone de distribution de données créant 1000 sampling est même que celle de données originales. Seulement la t-valeur est différente (1ers données: -20.815, 2ème données : -48.613) car c'est ici où il n'exist que la différence de nombre d'observation.  
-  
+Si nous réalisons l'expérience avec les données facultatives, nous pouvons observer que la distribution empirique est 0. Donc, nous pouvons rejeter l’hypothèse nulle. La t-valeur(statistics : -48.613) n’existe pas graphiquement dans la loi normale. En plus, la zone de distribution de données créant 1000 sampling est même que celle de données originales. Seulement la t-valeur(statistics) est différente (1ères données: -20.815, 2ème données : -48.613) car c'est ici où il n'exist que la différence de nombre d'observation. Car, dans les données facultatives (1000 sampling), nous avons utilisé les mêmes moyennes et déviations normales de données originales.   
    
 **Conclusion**  
 Quand nous comparons deux données originales et facultatives, nous pouvons savoir comme ci-dessous,   
- 1. Pour le résultat de t-test de deux données, la p-valeur est significative, et est égale : 2.2e-16.  
- 2. Pour la t-valeur, les données facultatives sont plus grandes que les données originales (-20.815 > -48.613).  
+ 1. Pour le résultat de t-test de deux données, la p-valeur est significative, et est égale : 2.2e-16. Car, dans les données facultatives (1000 sampling), nous avons utilisé les mêmes moyennes et déviations normales de données originales.     
+ 2. Pour la t-valeur(statistics), les données originales sont plus grandes que les données facultatives (-20.815 > -48.613).  
 
- Enfin, si nous créons les données, nous ne pouvons également pas adapter l'hypothèse nulle. Seulement nous pouvons savoir que la t-valeur de données avec 1000 sampling étant la loi nomrale, est plus grande que celle sur les données originales. En plus, pour deux hypothèses, nous rejetons les hypothèses nulles de deux données(originals et facultatives).  
- 1ère et 2ème **p-valeurs** de t-test :  
- - 1ère : 2.2e-16  
- - 2ème : 2.2e-16 
+ Enfin, si nous créons les données, nous ne pouvons également pas adapter l'hypothèse nulle. Seulement nous pouvons savoir que la t-valeur(statistics) de données avec 1000 sampling étant la loi nomrale, est plus grande que celle sur les données originales. En plus, pour deux hypothèses, nous rejetons l'hypothèse nulle de deux données(originals et facultatives).  
+ 1ère et 2ème **p-valeurs** et **t-valuers** de t-test :  
+```{r, include=FALSE}
+resultat <- as.table(matrix(c(as.character(2.2e-16), as.character(2.2e-16), -20.815, -48.613), nrow=2, byrow=TRUE,
+                dimnames=list (c("p-valeur", "t-valeur"),
+                               c("orignal", "1000sampling")))) 
+```
+```{r}
+knitr::kable(resultat)
+```
    
-## 2ème partie : l'analyse de regression
-### 2-1. Analyse de corrélation entre la consommation de carburant et le poids de voiture
-** Rangement les données**
+## 3ème partie : l'analyse de regression sur la consommation de carburant et le poids de la voiture
+### Analyse de corrélation entre la consommation de carburant et le poids de voiture
+**Rangement les données**
 ```{r}
 r_cars <- cars %>%
   dplyr::select(poids, consommation.de.carburant) %>%
@@ -578,18 +589,19 @@ r_cars <- cars %>%
   dplyr::ungroup()
 ```
 
-** Vérifier le résultat d'analyse de regression**
+**Vérifier le résultat d'analyse de regression**
 ```{r}
 m <- lm(consommation.de.carburant~poids, data=r_cars)
 summary(m)
 ```
-Nous pouvons savoir que le poids de la voiture et la consommation de carburant sont très significatifs car la p-valeur(2e-16***) est inférieure à 0.05.  
-En d'autres termes, nous pouvons comprendre que plus le poids de la voiture est gros, plus la consommation de carburant de la voiture réduit (est mauvaise). Et, ce résultat explique environ 42% (R-sqaured : 0.4211).  
+Nous pouvons savoir que le poids de la voiture et la consommation de carburant sont très significatifs car la p-valeur(**2.2e-16**) est inférieure à 0.05.  
+En d'autres termes, nous pouvons comprendre que plus le poids de la voiture est gros, plus la consommation de carburant de la voiture réduit (est mauvaise).   
+Et, ce résultat explique environ **42%** (R-sqaured : **0.4211**).   
 Ensuite, nous pouvons savoir certaines valeurs,  
-Le y-intercept est 20.1337296, la pente est -0.004995.   
+Le y-intercept est **20.1337296**, la pente est **-0.004995**.   
 En plus, nous pouvons prédire la valeur de la consommation de carburant comme cela :   
-**consommation de carburant = -0.004995 X poids + 20.1337296.**  
-Et,La forme de la ligne parait la diagonale de haut en bas comme la graphie ci-dessous ;   
+**consommation de carburant = -0.0049955 X poids + 20.1337296.**  
+Et, la forme de la ligne parait la diagonale de haut en bas comme la graphie ci-dessous ;   
   
 **[Figure 15]. le résultat à travers de la nuage de points**
 ```{r}
@@ -601,23 +613,23 @@ ggplot2::ggplot(r_cars,
   ggplot2::geom_smooth(method=lm)
 ```
   
-Comme je l'ai dit auparavant, nous pouvons généralement observer que plus le poids augmente, plus la consommation de carburant réduit. Cependant, comme nous le observons, dans la zone de poind de la voiture étant inférieure à 1000. kg, bien que le poids soit petit, la consommation de carburant de certaines voitures n'est pas bien. Nous pouvons supposer que certaines voitures subissent l'influence de les autres conditions. Comme nous analysons le résultat d'analyse de regression ci-dessus, cette analyse de regression nous explique environ 42%.  
+Comme je l'ai dit auparavant, nous pouvons généralement observer que plus le poids augmente, plus la consommation de carburant réduit. Cependant, comme nous le observons, dans la zone de la voiture étant inférieure à 1000 kg, bien que le poids soit petit, la consommation de carburant de certaines voitures n'est pas bien(moins 10 km/L). Nous pouvons supposer que certaines voitures subissent l'influence de les autres conditions. Comme nous analysons le résultat d'analyse de regression ci-dessus, cette analyse de regression nous explique environ 42%.  
   
 **Prédiction de consommation de carburant sur le poids de voitures**
 ```{r}
 new_car_1 <- data.frame(poids=3222)
 predict(m, new_car_1)
 ```
-Nous pouvons prédire un résultat que nous voulons. Si nous pouvons savoir la consommation de carburant, nous pouvons savoir le résultat de prédictition. Lorsque le poids de la voiture est 3222 kg, la consommation de carburant représente 4.038262.  
+Nous pouvons prédire un résultat que nous voulons. Si nous pouvons savoir la consommation de carburant, nous pouvons savoir le résultat de prédictition. Lorsque le poids de la voiture est 3222 kg, la consommation de carburant prédit 4.038262.  
 C'est-à-dire, si le poids de voiture est 3222 kg, la consommation de carburant de cette voiture prend 4.038262km/L.
 
 ##Conclusion
-Jusqu'à mainentant, nous avons examiné 3 résultats :
+Jusqu'à mainentant, nous avons examiné 3 résultats ;   
 1. Le prix entre l'automatique et la manuelle est différent  
 2. La couple entre l'essence et le gazole est différente  
 3. Plus le poids de la voiture augmente, plus la consommation de carburant de la voiture est mauvaise.  
    
 **En d'autres termes, nous pouvons rejeter toutes les 3 hypothèses.**  
    
-Et, quand nous avons observé la différence entre deux groupes dans les données originales, bien que la distribution ne soit pas en loi normale, nous avons obtenu le même résultat par t-test. Et, nous avons observé le résultat après avoir créé les données étant en loi normale. Le résultat aussi, il est que deux données ne sont pas différente sur p-valuer. Cependant, il n'est que différent sur la t-valeur. C'est-à-dire, nous avons pu parler que plus le nombre d'obsevation augemente, plus la t-value est grande.  
+Et, quand nous avons observé la différence entre deux groupes dans les données originales, bien que la distribution ne soit pas en loi normale, nous avons obtenu le même résultat par t-test. Et, nous avons observé le résultat après avoir créé les données étant en loi normale. Le résultat aussi, il est que deux données ne sont pas différente sur p-valuer. Cependant, il n'est que différent sur la t-valeur(statistics). C'est-à-dire, nous avons pu parler que plus le nombre d'obsevation augemente, plus la t-value est grande.  
 Ensuite, nous pouvons supposer que plus le poids de la voiture augmente, plus la consommation de carburant de la votiure est mauvaise, par l'analyse de regression. Et, à travers du résultat, nous pouvons obtenir la valeur de consommation de carburant sur le poids facultatif que nous voulons. Pourtant, nous ne pouvons pas parler que ce résultat est parfait pour expliquer la corrélation entre deux facteurs (poids et consommation de carburant). Car nous avons déjà observé la graphie et le résultat de Multiple R-squared (0.4211) : 42% de force d'explication. S'il en ainsi est, nous avons besoin de consider les autres conditions pour influencer à la consommation de carburant. 
